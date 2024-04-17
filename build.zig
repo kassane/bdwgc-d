@@ -2,7 +2,11 @@ const std = @import("std");
 const abs = @import("anotherBuildStep");
 
 pub fn build(b: *std.Build) !void {
-    const target = b.standardTargetOptions(.{});
+    // ldc2 not support mingw
+    const target = b.standardTargetOptions(.{ .default_target = if (@import("builtin").os.tag == .windows)
+        try std.Target.Query.parse(.{ .arch_os_abi = "native-windows-msvc" })
+    else
+        .{} });
     const optimize = b.standardOptimizeOption(.{});
     const bdwgc = b.dependency("bdwgc", .{
         .target = target,
@@ -18,6 +22,7 @@ pub fn build(b: *std.Build) !void {
         .sources = &.{"examples/example1.d"},
         .dflags = &.{
             "-w",
+            "-vgc",
             "-Isrc",
             b.fmt("-P-I{s}", .{bdwgc.path("include").getPath(b)}),
         },

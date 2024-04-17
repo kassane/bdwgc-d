@@ -20,5 +20,5 @@ jobs:
 
       - name: Build Summary
         run: zig build --summary all --verbose
-      - name: Build Summary
+      - name: Run
         run: zig build run-example1
