@@ -1,0 +1,3 @@
+name "bdwgc-d"
+description "bdwgc - D bindings"
+targetType "library"
