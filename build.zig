@@ -8,21 +8,28 @@ pub fn build(b: *std.Build) !void {
     else
         .{} });
     const optimize = b.standardOptimizeOption(.{});
+
+    try buildExe(b, "example1", .{ target, optimize });
+    try buildExe(b, "example2", .{ target, optimize });
+}
+fn buildExe(b: *std.Build, comptime name: []const u8, options: anytype) !void {
     const bdwgc = b.dependency("bdwgc", .{
-        .target = target,
-        .optimize = optimize,
+        .target = options[0],
+        .optimize = options[1],
         .BUILD_SHARED_LIBS = false,
     });
+
     const exe = try abs.ldcBuildStep(b, .{
-        .name = "example1",
-        .target = target,
-        .optimize = optimize,
+        .name = name,
+        .target = options[0],
+        .optimize = options[1],
         .betterC = true, // disable D runtimeGC
         .artifact = bdwgc.artifact("gc"),
-        .sources = &.{"examples/example1.d"},
+        .sources = &.{"examples/" ++ name ++ ".d"},
         .dflags = &.{
             "-w",
-            "-vgc",
+            "-vgc", // see Druntime GC if enabled
+            "-vtls", // thread-local storage
             "-Isrc",
             b.fmt("-P-I{s}", .{bdwgc.path("include").getPath(b)}),
         },
