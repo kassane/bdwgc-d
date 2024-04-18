@@ -1,5 +1,5 @@
 const std = @import("std");
-const abs = @import("anotherBuildStep");
+const abs = @import("abs");
 
 pub fn build(b: *std.Build) !void {
     // ldc2 not support mingw
@@ -9,30 +9,38 @@ pub fn build(b: *std.Build) !void {
         .{} });
     const optimize = b.standardOptimizeOption(.{});
 
-    try buildExe(b, "example1", .{ target, optimize });
-    try buildExe(b, "example2", .{ target, optimize });
-}
-fn buildExe(b: *std.Build, comptime name: []const u8, options: anytype) !void {
     const bdwgc = b.dependency("bdwgc", .{
-        .target = options[0],
-        .optimize = options[1],
+        .target = target,
+        .optimize = optimize,
         .BUILD_SHARED_LIBS = false,
     });
 
-    const exe = try abs.ldcBuildStep(b, .{
-        .name = name,
-        .target = options[0],
-        .optimize = options[1],
+    try buildExe(b, .{
+        .name = "example1",
+        .target = target,
+        .optimize = optimize,
         .betterC = true, // disable D runtimeGC
         .artifact = bdwgc.artifact("gc"),
-        .sources = &.{"examples/" ++ name ++ ".d"},
+        .sources = &.{"examples/example1.d"},
         .dflags = &.{
             "-w",
-            "-vgc", // see Druntime GC if enabled
-            "-vtls", // thread-local storage
             "-Isrc",
-            b.fmt("-P-I{s}", .{bdwgc.path("include").getPath(b)}),
         },
     });
+    try buildExe(b, .{
+        .name = "example2",
+        .target = target,
+        .optimize = optimize,
+        .betterC = true, // disable D runtimeGC
+        .artifact = bdwgc.artifact("gc"),
+        .sources = &.{"examples/example2.d"},
+        .dflags = &.{
+            "-w",
+            "-Isrc",
+        },
+    });
+}
+fn buildExe(b: *std.Build, options: abs.DCompileStep) !void {
+    const exe = try abs.ldcBuildStep(b, options);
     b.default_step.dependOn(&exe.step);
 }

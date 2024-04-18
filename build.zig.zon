@@ -2,9 +2,9 @@
     .name = "bdwgc",
     .version = "0.1.0",
     .dependencies = .{
-        .anotherBuildStep = .{
+        .abs = .{
             .url = "git+https://github.com/kassane/anotherBuildStep#main",
-            .hash = "1220d609e447a36dfe876c76a4a60f7e9a54e4fd7c4c21fb8a4452a6dbab57d95d6a",
+            .hash = "12201a8ca860ea3f27538562f1862891242699679edde2a6159b73177b3c495ff6de",
         },
         .bdwgc = .{
             .url = "git+https://github.com/ivmai/bdwgc#df1a787929aa550ec5343442fd2212a2717ac0cd",
