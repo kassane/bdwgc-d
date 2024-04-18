@@ -73,16 +73,14 @@ pub fn build(b: *std.Build) !void {
         },
     });
 
-    // C++ build test
-
-    const exe = b.addExecutable(.{
-        .name = "cpp_tests",
+    const lib = b.addStaticLibrary(.{
+        .name = "example4",
         .target = target,
         .optimize = optimize,
     });
-    exe.addCSourceFiles(.{
+    lib.addCSourceFiles(.{
         .root = bdwgc_path,
-        .files = if (exe.rootModuleTarget().abi != .msvc)
+        .files = if (lib.rootModuleTarget().abi != .msvc)
             &.{
                 "gc_cpp.cc",
                 "gc_badalc.cc",
@@ -98,8 +96,8 @@ pub fn build(b: *std.Build) !void {
             "-Wextra",
         },
     });
-    exe.addCSourceFile(.{
-        .file = b.path("tests/cpp.cc"),
+    lib.addCSourceFile(.{
+        .file = b.path("examples/example4.cc"),
         .flags = &.{
             "-Wall",
             "-Wpedantic",
@@ -107,18 +105,26 @@ pub fn build(b: *std.Build) !void {
         },
     });
     for (bdwgc_artifact.root_module.include_dirs.items) |dir| {
-        exe.addIncludePath(dir.path);
+        lib.addIncludePath(dir.path);
     }
-    exe.linkLibrary(bdwgc_artifact);
-    if (exe.rootModuleTarget().abi != .msvc) {
-        exe.linkLibCpp();
+    lib.linkLibrary(bdwgc_artifact);
+    if (lib.rootModuleTarget().abi != .msvc) {
+        lib.linkLibCpp();
     } else {
-        exe.linkLibC();
+        lib.linkLibC();
     }
-    b.installArtifact(exe);
-    const run_cmd = b.addRunArtifact(exe);
-    const run_step = b.step("run-cpp", "Run the C++ app");
-    run_step.dependOn(&run_cmd.step);
+    try buildExe(b, .{
+        .name = "example4",
+        .target = target,
+        .optimize = optimize,
+        .betterC = true, // need D runtimeGC
+        .artifact = lib,
+        .sources = &.{"examples/example4.d"},
+        .dflags = &.{
+            "-w",
+            "-Isrc",
+        },
+    });
 }
 fn buildExe(b: *std.Build, options: abs.DCompileStep) !void {
     const exe = try abs.ldcBuildStep(b, options);

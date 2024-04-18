@@ -25,4 +25,4 @@ jobs:
             zig build run-example1
             zig build run-example2
             zig build run-example3
-            zig build run-cpp
+            zig build run-example4

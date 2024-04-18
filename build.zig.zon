@@ -4,7 +4,7 @@
     .dependencies = .{
         .abs = .{
             .url = "git+https://github.com/kassane/anotherBuildStep#main",
-            .hash = "12201a8ca860ea3f27538562f1862891242699679edde2a6159b73177b3c495ff6de",
+            .hash = "12200d68b7fe7b0c3b63c703ee20eb919fe15760b62e794946e99fd11c4f2e738378",
         },
         .bdwgc = .{
             .url = "git+https://github.com/ivmai/bdwgc#df1a787929aa550ec5343442fd2212a2717ac0cd",
