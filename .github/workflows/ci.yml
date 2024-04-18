@@ -24,3 +24,4 @@ jobs:
         run: |
             zig build run-example1
             zig build run-example2
+            zig build run-example3
