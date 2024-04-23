@@ -7,8 +7,8 @@
             .hash = "12200d68b7fe7b0c3b63c703ee20eb919fe15760b62e794946e99fd11c4f2e738378",
         },
         .bdwgc = .{
-            .url = "git+https://github.com/ivmai/bdwgc#df1a787929aa550ec5343442fd2212a2717ac0cd",
-            .hash = "1220dd93f4ff1564d7174a0af33d647c1901fc63c4edb4f1ace710a4af1c2d65174e",
+            .url = "git+https://github.com/kassane/bdwgc#zig-msvc",
+            .hash = "1220e2f0716e899afa22a26006ea23d02cff00f6957a5e4abaf053533fbbf58d30d9",
         },
     },
     .paths = .{""},

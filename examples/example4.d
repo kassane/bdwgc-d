@@ -9,7 +9,8 @@ extern (C++)
         Person* people;
     }
 
-    Person createPerson(const(char)* name, int age);
+    Person* newPerson();
+    void createPerson(Person* p, const(char)* name, int age);
 }
 extern (C):
 void main()
@@ -17,8 +18,10 @@ void main()
     GC_init();
     GC_set_all_interior_pointers(1);
 
-    Person p1 = createPerson("John", 42);
-    Person p2 = createPerson("Sarah", 35);
+    auto p1 = newPerson();
+    auto p2 = newPerson();
+    createPerson(p1, "John", 42);
+    createPerson(p2, "Sarah", 35);
     GC_gcollect();
     GC_printf("%s, have %d years old.\n", p1.name, p1.age);
     GC_printf("%s, have %d years old.\n", p2.name, p2.age);
