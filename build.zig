@@ -1,6 +1,8 @@
 const std = @import("std");
 const abs = @import("abs");
 
+const is_threaded = !@import("builtin").single_threaded;
+
 pub fn build(b: *std.Build) !void {
     // ldc2/ldmd2 not have mingw-support
     const target = b.standardTargetOptions(.{ .default_target = if (@import("builtin").os.tag == .windows)
@@ -15,7 +17,8 @@ pub fn build(b: *std.Build) !void {
         .BUILD_SHARED_LIBS = false,
         .disable_handle_fork = false,
         .enable_cplusplus = true,
-        .enable_threads = true,
+        .enable_throw_bad_alloc_library = false,
+        .enable_threads = is_threaded,
         .enable_thread_local_alloc = true,
         .enable_large_config = false,
         .enable_munmap = false,
@@ -23,23 +26,18 @@ pub fn build(b: *std.Build) !void {
         .enable_redirect_malloc = false,
         .enable_rwlock = false,
         .enable_gc_assertions = true,
-        .enable_gc_debug = false,
+        .enable_gc_debug = (optimize == .Debug),
     });
     const bdwgc_artifact = bdwgc.artifact("gc");
-    b.installArtifact(bdwgc_artifact);
-    b.installArtifact(bdwgc.artifact("gctba"));
-    b.installArtifact(bdwgc.artifact("gccpp"));
 
     // generate di file (like, zig-translate-c from D-importC)
     // note: ImportC just gives no-mangling C code,
     // but does not suppress D features exception and DruntimeGC.
     // try buildD(b, .{
-    //     .name = "bdwgcd",
+    //     .name = "cimport",
     //     .target = target,
     //     .optimize = optimize,
-    //     .betterC = true, // disable D runtimeGC
     //     .kind = .obj,
-    //     .artifact = bdwgc_artifact,
     //     .sources = &.{"src/gc.c"},
     //     .dflags = &.{
     //         "-w",
@@ -49,6 +47,7 @@ pub fn build(b: *std.Build) !void {
     //     },
     // });
 
+    // Unit tests
     try buildD(b, .{
         .name = "bdwgc_tests",
         .target = target,
@@ -62,6 +61,8 @@ pub fn build(b: *std.Build) !void {
             "-Isrc",
         },
     });
+
+    // Example 1
     try buildD(b, .{
         .name = "example1",
         .target = target,
@@ -74,6 +75,8 @@ pub fn build(b: *std.Build) !void {
             "-Isrc",
         },
     });
+
+    // Example 2
     try buildD(b, .{
         .name = "example2",
         .target = target,
@@ -86,6 +89,8 @@ pub fn build(b: *std.Build) !void {
             "-Isrc",
         },
     });
+
+    // Example 3
     try buildD(b, .{
         .name = "example3",
         .target = target,
@@ -99,7 +104,7 @@ pub fn build(b: *std.Build) !void {
         },
     });
 
-    // example - Mixing C++ and D code
+    // example 4 - Mixing C++ and D code
     const libcpp = b.addStaticLibrary(.{
         .name = "example4",
         .target = target,
@@ -121,12 +126,12 @@ pub fn build(b: *std.Build) !void {
         libcpp.addIncludePath(dir.path);
     }
     libcpp.linkLibrary(bdwgc.artifact("gccpp"));
-    libcpp.linkLibrary(bdwgc.artifact("gctba"));
     if (libcpp.rootModuleTarget().abi != .msvc) {
         libcpp.linkLibCpp();
     } else {
         libcpp.linkLibC();
     }
+
     try buildD(b, .{
         .name = "example4",
         .target = target,
@@ -138,19 +143,6 @@ pub fn build(b: *std.Build) !void {
             "-w",
             "-Isrc",
             "-extern-std=c++17",
-        },
-    });
-
-    try buildD(b, .{
-        .name = "example5",
-        .target = target,
-        .optimize = optimize,
-        .betterC = false, // need D runtimeGC
-        .artifact = bdwgc_artifact,
-        .sources = &.{"examples/example5.d"},
-        .dflags = &.{
-            "-w",
-            "-Isrc",
         },
     });
 }
