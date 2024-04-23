@@ -8,6 +8,7 @@ jobs:
       fail-fast: false
       matrix:
         runs-on: [ubuntu-latest, macos-latest, windows-latest]
+        optimize-mode: [ReleaseSafe, ReleaseFast, ReleaseSmall, Debug]
     runs-on: ${{ matrix.runs-on }}
     steps:
       - uses: actions/checkout@v4
@@ -19,10 +20,10 @@ jobs:
           compiler: ldc-master
 
       - name: Build Summary
-        run: zig build --summary all --verbose
+        run: zig build --summary all --verbose -Doptimize=${{ matrix.optimize-mode }}
       - name: Run
         run: |
-            zig build run-example1
-            zig build run-example2
-            zig build run-example3
-            zig build run-example4
+            zig build run-example1 -Doptimize=${{ matrix.optimize-mode }}
+            zig build run-example2 -Doptimize=${{ matrix.optimize-mode }}
+            zig build run-example3 -Doptimize=${{ matrix.optimize-mode }}
+            zig build run-example4 -Doptimize=${{ matrix.optimize-mode }}
