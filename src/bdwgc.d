@@ -1,6 +1,9 @@
 module bdwgc;
 public import gc;
 
+pragma(printf)
+extern (C) void GC_printf(const(char)* format, ...);
+
 @("GC initialization")
 @system unittest
 {
@@ -31,6 +34,6 @@ public import gc;
     for (auto i = 0; i < 1024; i++)
     {
         auto mem = GC_malloc(size_t.sizeof * 4);
-        GC_gcollect();
+        GC_free(mem);
     }
 }

@@ -1,14 +1,21 @@
 import bdwgc;
-import core.stdc.stdio;
+
+enum max = 10_000_000;
 
 extern (C)
 void main()
 {
-    printf("Allocating 1024 bytes of memory...\n");
     GC_init();
-    for (auto i = 0; i < 1024; i++)
+
+    foreach (i; 0 .. max)
     {
-        auto mem = GC_malloc(size_t.sizeof * 4);
-        GC_free(mem);
+        auto p = cast(int**) GC_malloc(size_t.sizeof);
+        auto q = cast(int*) GC_malloc(size_t.sizeof);
+        *p = cast(int*) GC_realloc(q, size_t.sizeof * 2);
+        if (i % 100_000 == 0)
+        {
+            const heap = GC_get_heap_size();
+            GC_printf("heap size: %ld\n", heap);
+        }
     }
 }

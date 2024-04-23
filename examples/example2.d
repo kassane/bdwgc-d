@@ -1,5 +1,4 @@
 import bdwgc;
-import core.stdc.stdio;
 
 extern (C)
 void main()
@@ -15,6 +14,6 @@ void main()
     // Print names
     for (int i = 0; i < 3; i++)
     {
-        printf("Name: %s\n", names[i]);
+        GC_printf("Name: %s\n", names[i]);
     }
 }

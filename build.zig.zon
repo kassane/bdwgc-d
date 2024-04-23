@@ -1,6 +1,6 @@
 .{
-    .name = "bdwgc",
-    .version = "0.1.0",
+    .name = "bdwgc-d",
+    .version = "0.2.0",
     .dependencies = .{
         .abs = .{
             .url = "git+https://github.com/kassane/anotherBuildStep#main",
@@ -11,5 +11,10 @@
             .hash = "1220e2f0716e899afa22a26006ea23d02cff00f6957a5e4abaf053533fbbf58d30d9",
         },
     },
-    .paths = .{""},
+    .paths = .{
+        "LICENSE",
+        "README.md",
+        "build.zig",
+        "build.zig.zon",
+    },
 }

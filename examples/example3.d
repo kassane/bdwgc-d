@@ -1,7 +1,6 @@
 import bdwgc;
 import core.memory;
 import core.thread;
-import core.stdc.stdio;
 
 void main()
 {
@@ -22,9 +21,9 @@ void main()
         // Print elements
         foreach (n; numbers[0 .. 100])
         {
-            printf("%d ", n);
+            GC_printf("%d ", n);
         }
-        printf("\n");
+        GC_printf("\n");
     });
     t.start();
     t.join();

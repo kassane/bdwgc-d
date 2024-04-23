@@ -12,7 +12,7 @@ extern (C++)
     Person* newPerson();
     void createPerson(Person* p, const(char)* name, int age);
 }
-extern (C):
+extern (C)
 void main()
 {
     GC_init();
@@ -26,5 +26,3 @@ void main()
     GC_printf("%s, have %d years old.\n", p1.name, p1.age);
     GC_printf("%s, have %d years old.\n", p2.name, p2.age);
 }
-pragma(printf)
-void GC_printf(const(char)* format, ...);
