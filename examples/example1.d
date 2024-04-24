@@ -15,7 +15,14 @@ void main()
         if (i % 100_000 == 0)
         {
             const heap = GC_get_heap_size();
-            GC_printf("heap size: %ld\n", heap);
+            version (Windows)
+            {
+                GC_printf("heap size: %d\n", heap);
+            }
+            else
+            {
+                GC_printf("heap size: %ld\n", heap);
+            }
         }
     }
 }
