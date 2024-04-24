@@ -17,7 +17,7 @@ void main()
             const heap = GC_get_heap_size();
             version (Windows)
             {
-                GC_printf("heap size: %d\n", heap);
+                GC_printf("heap size: %u\n", cast(uint)heap);
             }
             else
             {

@@ -1,11 +1,6 @@
 module bdwgc;
 public import gc;
 
-version (CRuntime_Microsoft)
-{
-    version (Debug) pragma(lib, "msvcrtd.lib");
-}
-
 pragma(printf)
 extern (C) void GC_printf(const(char)* format, ...);
 
