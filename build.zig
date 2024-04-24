@@ -92,10 +92,7 @@ pub fn build(b: *std.Build) !void {
         .sources = &.{"examples/example3.d"},
         .dflags = &.{
             "-Isrc",
-            if (libgc.rootModuleTarget().abi == .msvc and optimize == .Debug)
-                "-P-D_DEBUG"
-            else
-                "-w",
+            "-w",
         },
     });
 
