@@ -1,8 +1,16 @@
 module bdwgc;
 public import gc;
 
-pragma(printf)
-extern (C) void GC_printf(const(char)* format, ...);
+version (Windows)
+{
+    private import core.stdc.stdio : printf;
+    alias GC_printf = printf;
+}
+else
+{
+    pragma(printf)
+    extern (C) void GC_printf(const(char)* format, ...);
+}
 
 @("GC initialization")
 @system unittest
