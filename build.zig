@@ -54,95 +54,96 @@ pub fn build(b: *std.Build) !void {
         },
     });
 
-    // Example 1
-    try buildD(b, .{
-        .name = "example1",
-        .target = target,
-        .optimize = optimize,
-        .betterC = true, // disable D runtimeGC
-        .artifact = libgc,
-        .sources = &.{"examples/example1.d"},
-        .dflags = &.{
-            "-w",
-            "-Isrc",
-        },
-    });
-
-    // Example 2
-    try buildD(b, .{
-        .name = "example2",
-        .target = target,
-        .optimize = optimize,
-        .betterC = true, // disable D runtimeGC
-        .artifact = libgc,
-        .sources = &.{"examples/example2.d"},
-        .dflags = &.{
-            "-w",
-            "-Isrc",
-        },
-    });
-
-    // Example 3
-    try buildD(b, .{
-        .name = "example3",
-        .target = target,
-        .optimize = optimize,
-        .betterC = false, // need D runtimeGC
-        .artifact = libgc,
-        .sources = &.{"examples/example3.d"},
-        .dflags = &.{
-            "-Isrc",
-            "-w",
-        },
-    });
-
-    if (libgccxx) |gccpp| {
-        // example 4 - Mixing C++ and D code
-        const libcpp = b.addStaticLibrary(.{
-            .name = "example4",
-            .target = target,
-            .optimize = optimize,
-        });
-        libcpp.addCSourceFiles(.{
-            .files = &.{
-                "examples/example4.cc",
-            },
-            .flags = &.{
-                "-Wall",
-                "-Wpedantic",
-                "-Wextra",
-                "-std=c++17",
-            },
-        });
-        for (libgc.root_module.include_dirs.items) |dir| {
-            libcpp.addIncludePath(dir.path);
-        }
-        if (b.systemIntegrationOption("gccpp", .{}))
-            libcpp.linkSystemLibrary("gccpp")
-        else
-            libcpp.linkLibrary(gccpp);
-        if (libcpp.rootModuleTarget().abi != .msvc) {
-            libcpp.linkLibCpp();
-        } else {
-            libcpp.linkLibC();
-        }
-
-        if (config.artifact_dub)
-            b.installArtifact(libcpp);
-
+    if (config.build_examples) { // Example 1
         try buildD(b, .{
-            .name = "example4",
+            .name = "example1",
             .target = target,
             .optimize = optimize,
             .betterC = true, // disable D runtimeGC
-            .artifact = libcpp,
-            .sources = &.{"examples/example4.d"},
+            .artifact = libgc,
+            .sources = &.{"examples/example1.d"},
             .dflags = &.{
                 "-w",
                 "-Isrc",
-                "-extern-std=c++17",
             },
         });
+
+        // Example 2
+        try buildD(b, .{
+            .name = "example2",
+            .target = target,
+            .optimize = optimize,
+            .betterC = true, // disable D runtimeGC
+            .artifact = libgc,
+            .sources = &.{"examples/example2.d"},
+            .dflags = &.{
+                "-w",
+                "-Isrc",
+            },
+        });
+
+        // Example 3
+        try buildD(b, .{
+            .name = "example3",
+            .target = target,
+            .optimize = optimize,
+            .betterC = false, // need D runtimeGC
+            .artifact = libgc,
+            .sources = &.{"examples/example3.d"},
+            .dflags = &.{
+                "-Isrc",
+                "-w",
+            },
+        });
+
+        if (libgccxx) |gccpp| {
+            // example 4 - Mixing C++ and D code
+            const libcpp = b.addStaticLibrary(.{
+                .name = "example4",
+                .target = target,
+                .optimize = optimize,
+            });
+            libcpp.addCSourceFiles(.{
+                .files = &.{
+                    "examples/example4.cc",
+                },
+                .flags = &.{
+                    "-Wall",
+                    "-Wpedantic",
+                    "-Wextra",
+                    "-std=c++17",
+                },
+            });
+            for (libgc.root_module.include_dirs.items) |dir| {
+                libcpp.addIncludePath(dir.path);
+            }
+            if (b.systemIntegrationOption("gccpp", .{}))
+                libcpp.linkSystemLibrary("gccpp")
+            else
+                libcpp.linkLibrary(gccpp);
+            if (libcpp.rootModuleTarget().abi != .msvc) {
+                libcpp.linkLibCpp();
+            } else {
+                libcpp.linkLibC();
+            }
+
+            if (config.artifact_dub)
+                b.installArtifact(libcpp);
+
+            try buildD(b, .{
+                .name = "example4",
+                .target = target,
+                .optimize = optimize,
+                .betterC = true, // disable D runtimeGC
+                .artifact = libcpp,
+                .sources = &.{"examples/example4.d"},
+                .dflags = &.{
+                    "-w",
+                    "-Isrc",
+                    "-extern-std=c++17",
+                },
+            });
+        }
     }
 
     if (config.artifact_dub) {
@@ -225,10 +226,12 @@ fn optionsDefault(b: *std.Build, options: struct { target: std.Build.ResolvedTar
     const enable_handle_fork = b.option(bool, "enable_handle_fork", "Attempt to ensure a usable collector after fork()") orelse true;
     const disable_handle_fork = b.option(bool, "disable_handle_fork", "Prohibit installation of pthread_atfork() handlers") orelse !enable_handle_fork;
     const artifact_dub = b.option(bool, "artifact_dub", "Available artifacts to DUB") orelse false;
+    const build_examples = b.option(bool, "build_examples", "Build Examples") orelse true;
     return .{
         .target = options.target,
         .optimize = options.optimize,
         .artifact_dub = artifact_dub,
+        .build_examples = build_examples,
         // libgc configs
         .BUILD_SHARED_LIBS = build_shared_libs,
         .CFLAGS_EXTRA = cflags_extra,
@@ -292,5 +295,6 @@ const libGCConfig = struct {
     enable_gc_debug: bool,
     enable_checksums: bool,
     enable_werror: bool,
-    artifact_dub: bool = false,
+    artifact_dub: bool,
+    build_examples: bool,
 };

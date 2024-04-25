@@ -52,6 +52,8 @@ Project-Specific Options:
   -Ddisable_single_obj_compilation=[bool] Compile each libgc source file independently
   -Denable_handle_fork=[bool]  Attempt to ensure a usable collector after fork()
   -Ddisable_handle_fork=[bool] Prohibit installation of pthread_atfork() handlers
+  -Dartifact_dub=[bool]        Available artifacts to DUB
+  -Dbuild_examples=[bool]      Build Examples
 ```
 
 ### Compiler Support

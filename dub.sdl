@@ -30,7 +30,7 @@ subPackage {
 	libs "gc"
 	lflags "-Lzig-out/lib" platform="posix"
 	lflags "/LIBPATH:zig-out/lib" platform="windows"
-	preBuildCommands "zig build -Doptimize=ReleaseSafe -Dartifact_dub"
+	preBuildCommands "zig build -Doptimize=ReleaseSafe -Dartifact_dub -Dbuild_examples=false"
 }
 subPackage {
 	name "example2"
@@ -40,7 +40,7 @@ subPackage {
 	libs "gc"
 	lflags "-Lzig-out/lib" platform="posix"
 	lflags "/LIBPATH:zig-out/lib" platform="windows"
-	preBuildCommands "zig build -Doptimize=ReleaseSafe -Dartifact_dub"
+	preBuildCommands "zig build -Doptimize=ReleaseSafe -Dartifact_dub -Dbuild_examples=false"
 }
 subPackage {
 	name "example3"
@@ -50,15 +50,15 @@ subPackage {
 	libs "gc"
 	lflags "-Lzig-out/lib" platform="posix"
 	lflags "/LIBPATH:zig-out/lib" platform="windows"
-	preBuildCommands "zig build -Doptimize=ReleaseSafe -Dartifact_dub"
+	preBuildCommands "zig build -Doptimize=ReleaseSafe -Dartifact_dub -Dbuild_examples=false"
 }
-subPackage {
-	name "example4"
-	targetType "executable"
-	targetPath "build"
-	sourceFiles "examples/example4.d"
-	libs "gccpp" "gc" "example4"
-	lflags "-Lzig-out/lib" platform="posix"
-	lflags "/LIBPATH:zig-out/lib" platform="windows"
-	preBuildCommands "zig build -Doptimize=ReleaseSafe -Dartifact_dub"
-}
+// subPackage {
+// 	name "example4"
+// 	targetType "executable"
+// 	targetPath "build"
+// 	sourceFiles "examples/example4.d"
+// 	libs "gccpp" "gc" "example4"
+// 	lflags "-Lzig-out/lib" platform="posix"
+// 	lflags "/LIBPATH:zig-out/lib" platform="windows"
+// 	preBuildCommands "zig build -Doptimize=ReleaseSafe -Dartifact_dub -Dbuild_examples=false"
+// }
