@@ -127,6 +127,9 @@ pub fn build(b: *std.Build) !void {
             libcpp.linkLibC();
         }
 
+        if (config.artifact_dub)
+            b.installArtifact(libcpp);
+
         try buildD(b, .{
             .name = "example4",
             .target = target,
@@ -140,6 +143,13 @@ pub fn build(b: *std.Build) !void {
                 "-extern-std=c++17",
             },
         });
+    }
+
+    if (config.artifact_dub) {
+        b.installArtifact(libgc);
+        if (libgccxx) |cxx| {
+            b.installArtifact(cxx);
+        }
     }
 }
 fn buildD(b: *std.Build, options: abs.DCompileStep) !void {
@@ -214,9 +224,11 @@ fn optionsDefault(b: *std.Build, options: struct { target: std.Build.ResolvedTar
     const disable_single_obj_compilation = b.option(bool, "disable_single_obj_compilation", "Compile each libgc source file independently") orelse !enable_single_obj_compilation;
     const enable_handle_fork = b.option(bool, "enable_handle_fork", "Attempt to ensure a usable collector after fork()") orelse true;
     const disable_handle_fork = b.option(bool, "disable_handle_fork", "Prohibit installation of pthread_atfork() handlers") orelse !enable_handle_fork;
+    const artifact_dub = b.option(bool, "artifact_dub", "Available artifacts to DUB") orelse false;
     return .{
         .target = options.target,
         .optimize = options.optimize,
+        .artifact_dub = artifact_dub,
         // libgc configs
         .BUILD_SHARED_LIBS = build_shared_libs,
         .CFLAGS_EXTRA = cflags_extra,
@@ -252,7 +264,7 @@ fn optionsDefault(b: *std.Build, options: struct { target: std.Build.ResolvedTar
 const libGCConfig = struct {
     target: std.Build.ResolvedTarget,
     optimize: std.builtin.OptimizeMode,
-    BUILD_SHARED_LIBS: bool = false,
+    BUILD_SHARED_LIBS: bool,
     CFLAGS_EXTRA: []const u8,
     disable_handle_fork: bool,
     enable_cplusplus: bool,
@@ -280,4 +292,5 @@ const libGCConfig = struct {
     enable_gc_debug: bool,
     enable_checksums: bool,
     enable_werror: bool,
+    artifact_dub: bool = false,
 };
