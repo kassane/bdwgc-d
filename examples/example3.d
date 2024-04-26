@@ -4,13 +4,14 @@ import core.thread;
 
 void main()
 {
+    GC_set_find_leak(1);
     GC_init(); // Initialize GC
     GC_enable_incremental();
 
     GC_start_incremental_collection();
 
     auto t = new Thread(() {
-        int* numbers = cast(int*) GC_malloc(100 * int.sizeof);
+        int* numbers = cast(int*) GC_MALLOC(100 * int.sizeof);
 
         // Populate array
         foreach (i; 0 .. 100)

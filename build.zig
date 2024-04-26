@@ -16,10 +16,8 @@ pub fn build(b: *std.Build) !void {
 
     const config = optionsDefault(b, .{ .target = target, .optimize = optimize });
     const bdwgc = buildLibGC(b, config);
-    const libgc = if (config.enable_throw_bad_alloc_library)
-        bdwgc.artifact("gctba") // libgc + libgctba
-    else
-        bdwgc.artifact("gc");
+    const libgc = bdwgc.artifact("gc");
+    const libgctba = if (config.enable_throw_bad_alloc_library) bdwgc.artifact("gctba") else null;
     const libgccxx: ?*std.Build.Step.Compile = if (config.enable_cplusplus) bdwgc.artifact("gccpp") else null;
 
     // generate di file (like, zig-translate-c from D-importC)
@@ -150,6 +148,9 @@ pub fn build(b: *std.Build) !void {
         b.installArtifact(libgc);
         if (libgccxx) |cxx| {
             b.installArtifact(cxx);
+        }
+        if (libgctba) |tba| {
+            b.installArtifact(tba);
         }
     }
 }

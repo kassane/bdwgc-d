@@ -9,9 +9,9 @@ void main()
 
     foreach (i; 0 .. max)
     {
-        auto p = cast(int**) GC_malloc(size_t.sizeof);
-        auto q = cast(int*) GC_malloc(size_t.sizeof);
-        *p = cast(int*) GC_realloc(q, size_t.sizeof * 2);
+        auto p = cast(int**) GC_MALLOC_ATOMIC(size_t.sizeof);
+        auto q = cast(int*) GC_MALLOC(size_t.sizeof);
+        *p = cast(int*) GC_REALLOC(q, size_t.sizeof * 2);
         if (i % 100_000 == 0)
         {
             const heap = GC_get_heap_size();

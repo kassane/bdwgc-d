@@ -15,8 +15,8 @@ extern (C++)
 extern (C)
 void main()
 {
-    GC_init();
     GC_set_all_interior_pointers(1);
+    GC_init();
 
     auto p1 = newPerson();
     auto p2 = newPerson();
