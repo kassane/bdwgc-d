@@ -8,7 +8,7 @@
         },
         .bdwgc = .{
             .url = "git+https://github.com/kassane/bdwgc#zig-msvc",
-            .hash = "1220167ec5490d7a75f4797c69edc4279da1131fe138af197ad11c59fa5b35e76343",
+            .hash = "1220f2091f83e02a3fb02a01f6369796f811f56306b328ae7b0de0a3e51057e7a812",
         },
     },
     .paths = .{

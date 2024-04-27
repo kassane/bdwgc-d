@@ -17,7 +17,8 @@ pub fn build(b: *std.Build) !void {
     const config = optionsDefault(b, .{ .target = target, .optimize = optimize });
     const bdwgc = buildLibGC(b, config);
     const libgc = bdwgc.artifact("gc");
-    const libgctba = if (config.enable_throw_bad_alloc_library) bdwgc.artifact("gctba") else null;
+    const libcord: ?*std.Build.Step.Compile = if (config.build_cord) bdwgc.artifact("cord") else null;
+    const libgctba: ?*std.Build.Step.Compile = if (config.enable_throw_bad_alloc_library) bdwgc.artifact("gctba") else null;
     const libgccxx: ?*std.Build.Step.Compile = if (config.enable_cplusplus) bdwgc.artifact("gccpp") else null;
 
     // generate di file (like, zig-translate-c from D-importC)
@@ -152,6 +153,9 @@ pub fn build(b: *std.Build) !void {
         if (libgctba) |tba| {
             b.installArtifact(tba);
         }
+        if (libcord) |cord| {
+            b.installArtifact(cord);
+        }
     }
 }
 fn buildD(b: *std.Build, options: abs.DCompileStep) !void {
@@ -226,6 +230,7 @@ fn optionsDefault(b: *std.Build, options: struct { target: std.Build.ResolvedTar
     const disable_single_obj_compilation = b.option(bool, "disable_single_obj_compilation", "Compile each libgc source file independently") orelse !enable_single_obj_compilation;
     const enable_handle_fork = b.option(bool, "enable_handle_fork", "Attempt to ensure a usable collector after fork()") orelse true;
     const disable_handle_fork = b.option(bool, "disable_handle_fork", "Prohibit installation of pthread_atfork() handlers") orelse !enable_handle_fork;
+    const build_cord = b.option(bool, "build_cord", "Build cord library") orelse false;
     const artifact_dub = b.option(bool, "artifact_dub", "Available artifacts to DUB") orelse false;
     const build_examples = b.option(bool, "build_examples", "Build Examples") orelse true;
     return .{
@@ -255,6 +260,7 @@ fn optionsDefault(b: *std.Build, options: struct { target: std.Build.ResolvedTar
         .enable_disclaim = enable_disclaim,
         .enable_atomic_uncollectable = enable_atomic_uncollectable,
         .enable_rwlock = enable_rwlock,
+        .build_cord = build_cord,
         .enable_gc_assertions = enable_gc_assertions,
         .enable_valgrind_tracking = enable_valgrind_tracking,
         .enable_threads_discovery = enable_threads_discovery,
@@ -296,6 +302,7 @@ const libGCConfig = struct {
     enable_gc_debug: bool,
     enable_checksums: bool,
     enable_werror: bool,
+    build_cord: bool,
     artifact_dub: bool,
     build_examples: bool,
 };
