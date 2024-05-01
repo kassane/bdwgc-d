@@ -1,6 +1,6 @@
 name "bdwgc-d"
 description "bdwgc - D bindings"
-version "0.2.0"
+version "0.2.1"
 license "Apache-2.0"
 authors "Matheus Catarino França <matheus-catarino@hotmail.com>"
 copyright "Copyright 2024 - Matheus Catarino França"
