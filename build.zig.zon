@@ -12,6 +12,7 @@
         },
     },
     .paths = .{
+        "src",
         "LICENSE",
         "README.md",
         "build.zig",

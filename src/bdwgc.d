@@ -1,15 +1,28 @@
 module bdwgc;
-public import gc;
+version (D_BetterC)
+{
+    version (LDC)
+    {
+        pragma(LDC_no_moduleinfo);
+        pragma(LDC_no_typeinfo);
+    }
+    public import gc;
+}
+else
+{
+    public import cimport;
+}
 
 version (Windows)
 {
     private import core.stdc.stdio : printf;
+
     alias GC_printf = printf;
 }
 else
 {
     pragma(printf)
-    extern (C) void GC_printf(const(char)* format, ...);
+    extern (C) void GC_printf(const(char)* format, ...) @trusted @nogc nothrow;
 }
 
 @("GC initialization")
