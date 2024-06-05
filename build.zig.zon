@@ -3,8 +3,8 @@
     .version = "0.2.2",
     .dependencies = .{
         .abs = .{
-            .url = "git+https://github.com/kassane/anotherbuildstep#a3967aface30f223fc8da3978873932fe2f86e6d",
-            .hash = "12205d9106bde0a6ead7c7aade724e2b660484d80a3a79a79f40208086d4e5fe17a7",
+            .url = "git+https://github.com/kassane/anotherBuildStep#4cb71185673f600091b92aa082db33f7f6b0d38c",
+            .hash = "1220c7e6dc78a53c0504f93a4c9e885b8293873b799b7c755793f7d46a5309d5b6ed",
         },
         .bdwgc = .{
             .url = "git+https://github.com/ivmai/bdwgc#b1fe06200d716cd63d3ec321654fb4d03d610240",
