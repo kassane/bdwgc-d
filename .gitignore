@@ -25,4 +25,4 @@ build/
 *.lst
 
 # Zig
-zig-*/
+*zig-*/
