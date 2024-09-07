@@ -183,7 +183,6 @@ fn buildLibGC(b: *std.Build, options: libGCConfig) *std.Build.Dependency {
         .enable_gcj_support = options.enable_gcj_support,
         .enable_mmap = options.enable_mmap,
         .enable_java_finalization = options.enable_java_finalization,
-        .enable_parallel_mark = options.enable_parallel_mark,
         .enable_redirect_malloc = options.enable_redirect_malloc,
         .enable_disclaim = options.enable_disclaim,
         .enable_atomic_uncollectable = options.enable_atomic_uncollectable,
@@ -203,7 +202,6 @@ fn optionsDefault(b: *std.Build, options: struct { target: std.Build.ResolvedTar
     const enable_cplusplus = b.option(bool, "enable_cplusplus", "C++ support") orelse true;
     const build_shared_libs = b.option(bool, "BUILD_SHARED_LIBS", "Build shared libraries (otherwise static ones)") orelse false;
     const cflags_extra = b.option([]const u8, "CFLAGS_EXTRA", "Extra user-defined cflags") orelse "";
-    const enable_parallel_mark = b.option(bool, "enable_parallel_mark", "Parallelize marking and free list construction") orelse true;
     const enable_threads = b.option(bool, "enable_threads", "Support threads") orelse !builtin.single_threaded;
     const enable_thread_local_alloc = b.option(bool, "enable_thread_local_alloc", "Turn on thread-local allocation optimization") orelse true;
     const enable_threads_discovery = b.option(bool, "enable_threads_discovery", "Enable threads discovery in GC") orelse true;
@@ -255,7 +253,6 @@ fn optionsDefault(b: *std.Build, options: struct { target: std.Build.ResolvedTar
         .enable_gcj_support = enable_gcj_support,
         .enable_mmap = enable_mmap,
         .enable_java_finalization = enable_java_finalization,
-        .enable_parallel_mark = enable_parallel_mark,
         .enable_redirect_malloc = enable_redirect_malloc,
         .enable_disclaim = enable_disclaim,
         .enable_atomic_uncollectable = enable_atomic_uncollectable,
@@ -290,7 +287,6 @@ const libGCConfig = struct {
     enable_gcj_support: bool,
     enable_mmap: bool,
     enable_java_finalization: bool,
-    enable_parallel_mark: bool,
     enable_redirect_malloc: bool,
     enable_disclaim: bool,
     enable_atomic_uncollectable: bool,

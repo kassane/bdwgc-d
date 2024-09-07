@@ -1,14 +1,14 @@
 .{
     .name = "bdwgc-d",
-    .version = "0.2.3",
+    .version = "0.2.4",
     .dependencies = .{
         .abs = .{
-            .url = "git+https://github.com/kassane/anotherBuildStep#a1f40f90f17fa6d2681f9d46cf8dbc37d4f1ea89",
-            .hash = "1220bdfcf468e77dfdca5573ba5235f1db5ad10eb8ee030360dd402d5988e6bb4e41",
+            .url = "git+https://github.com/kassane/anotherBuildStep#1bbe77932971ce8be036583a95815d87eeec10fc",
+            .hash = "122090d279f1d06471142f5bd6a146bdd1b3e5a049b9c97b3d04033eb330d5167aec",
         },
         .bdwgc = .{
-            .url = "git+https://github.com/ivmai/bdwgc#6992ccfd01fc3d04a6ad891b5fc7ac54fe3c66f4",
-            .hash = "1220166b9b8c5093f9931dac58950dba248ba333b1e5819fe0a58b4599c88e585cd6",
+            .url = "git+https://github.com/ivmai/bdwgc#57ccbcc8a0514c001fb5e37ee3aab1ebc890672d",
+            .hash = "1220d2af5a9270ad31857b2dc69a911427d3ee89826966cee19cae42f481494d8496",
         },
     },
     .paths = .{
