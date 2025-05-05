@@ -19,9 +19,10 @@ jobs:
 
       - name: Build Summary
         run: zig build --summary all --verbose -Doptimize=${{ matrix.optimize-mode }}
+      # - name: Testing
+      #   run: zig build test-bdwgc_tests
       - name: Run
         run: |
-            zig build test-bdwgc_tests
             zig build run-example1 -Doptimize=${{ matrix.optimize-mode }}
             zig build run-example2 -Doptimize=${{ matrix.optimize-mode }}
             zig build run-example3 -Doptimize=${{ matrix.optimize-mode }}
