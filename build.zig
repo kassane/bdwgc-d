@@ -58,6 +58,7 @@ pub fn build(b: *std.Build) !void {
         .sources = &.{"src/bdwgc.d"},
         .cIncludePaths = include_dir.items,
         .importPaths = &.{"src"},
+        .use_zigcc = true,
         .dflags = &.{ "-w", "-Xcc=-std=c99", "-cov" },
     });
 
@@ -71,6 +72,7 @@ pub fn build(b: *std.Build) !void {
             .sources = &.{"examples/example1.d"},
             .cIncludePaths = include_dir.items,
             .importPaths = &.{"src"},
+            .use_zigcc = true,
             .dflags = &.{
                 "-w",
                 "-Xcc=-std=c99",
@@ -87,6 +89,7 @@ pub fn build(b: *std.Build) !void {
             .sources = &.{"examples/example2.d"},
             .cIncludePaths = include_dir.items,
             .importPaths = &.{"src"},
+            .use_zigcc = true,
             .dflags = &.{
                 "-w",
                 "-Xcc=-std=c99",
@@ -103,6 +106,7 @@ pub fn build(b: *std.Build) !void {
             .sources = &.{"examples/example3.d"},
             .cIncludePaths = include_dir.items,
             .importPaths = &.{"src"},
+            .use_zigcc = true,
             .dflags = &.{
                 "-w",
                 "-Xcc=-std=c99",
@@ -151,6 +155,7 @@ pub fn build(b: *std.Build) !void {
                 .artifact = libcpp,
                 .cIncludePaths = include_dir.items,
                 .importPaths = &.{"src"},
+                .use_zigcc = true,
                 .sources = &.{"examples/example4.d"},
                 .dflags = &.{
                     "-w",

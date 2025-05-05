@@ -18,7 +18,7 @@ jobs:
           compiler: ldc-master
 
       - name: Build Summary
-        run: zig build --summary all --verbose -Doptimize=${{ matrix.optimize-mode }}
+        run: zig build --summary all -Doptimize=${{ matrix.optimize-mode }}
       # - name: Testing
       #   run: zig build test-bdwgc_tests
       - name: Run
