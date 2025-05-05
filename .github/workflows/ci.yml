@@ -12,10 +12,8 @@ jobs:
     runs-on: ${{ matrix.runs-on }}
     steps:
       - uses: actions/checkout@v4
-      - uses: korandoru/setup-zig@v1
-        with:
-          zig-version: master
-      - uses: dlang-community/setup-dlang@v1
+      - uses: mlugg/setup-zig@v1
+      - uses: dlang-community/setup-dlang@v2
         with:
           compiler: ldc-master
 
@@ -23,7 +21,7 @@ jobs:
         run: zig build --summary all --verbose -Doptimize=${{ matrix.optimize-mode }}
       - name: Run
         run: |
-            zig build test
+            zig build test-bdwgc_tests
             zig build run-example1 -Doptimize=${{ matrix.optimize-mode }}
             zig build run-example2 -Doptimize=${{ matrix.optimize-mode }}
             zig build run-example3 -Doptimize=${{ matrix.optimize-mode }}

@@ -6,12 +6,8 @@ version (D_BetterC)
         pragma(LDC_no_moduleinfo);
         pragma(LDC_no_typeinfo);
     }
-    public import gc;
 }
-else
-{
-    public import cimport;
-}
+public import gc;
 
 version (Windows)
 {

@@ -14,7 +14,10 @@ pub fn build(b: *std.Build) !void {
     });
     const optimize = b.standardOptimizeOption(.{});
 
-    const config = optionsDefault(b, .{ .target = target, .optimize = optimize });
+    const config = optionsDefault(b, .{
+        .target = target,
+        .optimize = optimize,
+    });
     const bdwgc = buildLibGC(b, config);
     const libgc = bdwgc.artifact("gc");
     const libcord: ?*std.Build.Step.Compile = if (config.build_cord) bdwgc.artifact("cord") else null;
@@ -32,11 +35,18 @@ pub fn build(b: *std.Build) !void {
     //     .sources = &.{"src/gc.c"},
     //     .dflags = &.{
     //         "-w",
-    //         "-Isrc",
+    //
     //         // zig-out/module/cimport.di
     //         b.fmt("-Hf={s}/module/cimport.di", .{b.install_path}),
     //     },
     // });
+
+    var include_dir = std.ArrayList([]const u8).init(b.allocator);
+    defer include_dir.deinit();
+
+    for (libgc.root_module.include_dirs.items) |dir| {
+        include_dir.append(dir.path.getPath(b)) catch unreachable;
+    }
 
     // Unit tests
     try buildD(b, .{
@@ -46,11 +56,9 @@ pub fn build(b: *std.Build) !void {
         .kind = .@"test",
         .artifact = libgc,
         .sources = &.{"src/bdwgc.d"},
-        .dflags = &.{
-            "-w",
-            "-cov",
-            "-Isrc",
-        },
+        .cIncludePaths = include_dir.items,
+        .importPaths = &.{"src"},
+        .dflags = &.{ "-w", "-Xcc=-std=c99", "-cov" },
     });
 
     if (config.build_examples) { // Example 1
@@ -61,9 +69,11 @@ pub fn build(b: *std.Build) !void {
             .betterC = true, // disable D runtimeGC
             .artifact = libgc,
             .sources = &.{"examples/example1.d"},
+            .cIncludePaths = include_dir.items,
+            .importPaths = &.{"src"},
             .dflags = &.{
                 "-w",
-                "-Isrc",
+                "-Xcc=-std=c99",
             },
         });
 
@@ -75,9 +85,11 @@ pub fn build(b: *std.Build) !void {
             .betterC = true, // disable D runtimeGC
             .artifact = libgc,
             .sources = &.{"examples/example2.d"},
+            .cIncludePaths = include_dir.items,
+            .importPaths = &.{"src"},
             .dflags = &.{
                 "-w",
-                "-Isrc",
+                "-Xcc=-std=c99",
             },
         });
 
@@ -89,9 +101,11 @@ pub fn build(b: *std.Build) !void {
             .betterC = false, // need D runtimeGC
             .artifact = libgc,
             .sources = &.{"examples/example3.d"},
+            .cIncludePaths = include_dir.items,
+            .importPaths = &.{"src"},
             .dflags = &.{
-                "-Isrc",
                 "-w",
+                "-Xcc=-std=c99",
             },
         });
 
@@ -135,10 +149,12 @@ pub fn build(b: *std.Build) !void {
                 .optimize = optimize,
                 .betterC = true, // disable D runtimeGC
                 .artifact = libcpp,
+                .cIncludePaths = include_dir.items,
+                .importPaths = &.{"src"},
                 .sources = &.{"examples/example4.d"},
                 .dflags = &.{
                     "-w",
-                    "-Isrc",
+                    "-Xcc=-std=c99",
                     "-extern-std=c++17",
                 },
             });

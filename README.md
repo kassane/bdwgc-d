@@ -8,8 +8,8 @@ D library for interfacing with libgc (bdwgc) using [`importC`](https://dlang.org
 
 ### Required
 
-- [zig](https://ziglang.org/download) v0.12.0 or master
-- [ldc](https://ldc-developers.github.io) v1.36.0 or latest-CI (nightly)
+- [zig](https://ziglang.org/download) v0.14.0 or master
+- [ldc](https://ldc-developers.github.io) v1.40.0 or latest-CI (nightly)
 
 ### How to use (zig build)
 
