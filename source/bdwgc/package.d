@@ -108,7 +108,6 @@ struct GCAllocator
         @trusted @nogc nothrow
         void[] alignedAllocate(size_t bytes, uint a) shared
     {
-        import core.stdc.stdlib : _aligned_malloc;
 
         if (!bytes || !a.isGoodDynamicAlignment)
             return null;
@@ -135,8 +134,6 @@ struct GCAllocator
         }
         else version (Windows)
         {
-            import core.stdc.stdlib : _aligned_free;
-
             _aligned_free(b.ptr);
         }
         return true;
