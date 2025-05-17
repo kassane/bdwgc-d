@@ -2,7 +2,7 @@ import bdwgc;
 import core.memory;
 import core.thread;
 
-void main()
+void main() @trusted
 {
     GC_set_find_leak(1);
     GC_init(); // Initialize GC

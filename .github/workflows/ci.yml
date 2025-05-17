@@ -1,29 +1,52 @@
-name: CI Build
+name: CI
 
-on: [push]
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - '**'
 
 jobs:
   build:
     strategy:
-      fail-fast: false
       matrix:
-        runs-on: [ubuntu-latest, macos-latest, windows-latest]
-        optimize-mode: [ReleaseSafe, ReleaseFast, ReleaseSmall, Debug]
-    runs-on: ${{ matrix.runs-on }}
+        include:
+          - os: ubuntu-latest
+            arch: amd64
+            compiler: dmd-latest
+          - os: ubuntu-latest 
+            arch: amd64
+            compiler: ldc-master
+          - os: ubuntu-24.04-arm 
+            arch: arm64
+            compiler: ldc-master
+          - os: macos-latest
+            arch: arm64
+            compiler: ldc-master
+          - os: windows-latest
+            arch: amd64
+            compiler: dmd-latest
+          - os: windows-latest
+            arch: amd64
+            compiler: ldc-master
+      fail-fast: false
+    runs-on: ${{matrix.os}}
     steps:
       - uses: actions/checkout@v4
-      - uses: mlugg/setup-zig@v1
       - uses: dlang-community/setup-dlang@v2
         with:
-          compiler: ldc-master
-
-      - name: Build Summary
-        run: zig build --summary all -Doptimize=${{ matrix.optimize-mode }}
-      # - name: Testing
-      #   run: zig build test-bdwgc_tests
-      - name: Run
+          compiler: ${{matrix.compiler}}
+      - uses: egor-tensin/vs-shell@v2
+        with:
+          arch: x64
+      - name: Testing
+        run: dub test
+      - name: Build examples
+        working-directory: examples
         run: |
-            zig build run-example1 -Doptimize=${{ matrix.optimize-mode }}
-            zig build run-example2 -Doptimize=${{ matrix.optimize-mode }}
-            zig build run-example3 -Doptimize=${{ matrix.optimize-mode }}
-            zig build run-example4 -Doptimize=${{ matrix.optimize-mode }}
+          dub :example1
+          dub :example2
+          dub :example3
+          dub :example4

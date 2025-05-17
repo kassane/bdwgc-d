@@ -3,7 +3,7 @@ import bdwgc;
 enum max = 10_000_000;
 
 extern (C)
-void main()
+void main() @trusted
 {
     GC_init();
 

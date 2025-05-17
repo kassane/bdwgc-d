@@ -1,7 +1,7 @@
 import bdwgc;
 
 extern (C)
-void main()
+void main() @trusted
 {
     GC_init();
 
