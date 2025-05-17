@@ -214,6 +214,13 @@ struct GCAllocator
     static shared GCAllocator instance;
 }
 
+version (CRuntime_Microsoft)
+{
+    @nogc nothrow pure private extern (C) void* _aligned_malloc(size_t, size_t);
+    @nogc nothrow pure private extern (C) void _aligned_free(void* memblock);
+    @nogc nothrow pure private extern (C) void* _aligned_realloc(void*, size_t, size_t);
+}
+
 version (unittest)
 {
     @("Basic allocation and deallocation")
