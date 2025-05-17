@@ -1,0 +1,86 @@
+{
+    "name": "examples",
+    "description": "bdwgc - D bindings",
+    "subPackages": [
+        {
+            "name": "example1",
+            "mainSourceFile": "example1.d",
+            "targetPath": "build",
+            "targetType": "executable",
+            "buildOptions": [
+                "betterC"
+            ],
+            "dependencies": {
+                "bdwgc-d": {
+                    "path": "../"
+                }
+            }
+        },
+        {
+            "name": "example2",
+            "mainSourceFile": "example2.d",
+            "targetPath": "build",
+            "targetType": "executable",
+            "buildOptions": [
+                "betterC"
+            ],
+            "dependencies": {
+                "bdwgc-d": {
+                    "path": "../"
+                }
+            }
+        },
+        {
+            "name": "example3",
+            "mainSourceFile": "example3.d",
+            "targetPath": "build",
+            "targetType": "executable",
+            "dependencies": {
+                "bdwgc-d": {
+                    "path": "../"
+                }
+            }
+        },
+        {
+            "name": "example4",
+            "mainSourceFile": "example4.d",
+            "sourceFiles": [
+                "example4.o*"
+            ],
+            "targetPath": "build",
+            "targetType": "executable",
+            "dependencies": {
+                "bdwgc-d": {
+                    "path": "../"
+                }
+            },
+            "dflags": [
+                "-extern-std=c++14"
+            ],
+            "libs": [
+                "gc_cpp"
+            ],
+            "libs-linux": [
+                "stdc++"
+            ],
+            "libs-osx": [
+                "c++"
+            ],
+            "preGenerateCommands-linux": [
+                "g++ -I${BDWGC_D_PACKAGE_DIR}/bdwgc-master/include -c -o example4.o example4.cc"
+            ],
+            "preGenerateCommands-osx": [
+                "clang++ -std=c++14 -I${BDWGC_D_PACKAGE_DIR}/bdwgc-master/include -c -o example4.o example4.cc"
+            ],
+            "preGenerateCommands-windows": [
+                "cl /c example4.cc /I${BDWGC_D_PACKAGE_DIR}\\bdwgc-master\\include /Foexample4.obj"
+            ],
+            "postBuildCommands-posix": [
+                "rm *.o"
+            ],
+            "postBuildCommands-windows": [
+                "powershell -Command Remove-Item *.obj"
+            ]
+        }
+    ]
+}

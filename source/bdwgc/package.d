@@ -7,7 +7,7 @@ version (D_BetterC)
         pragma(LDC_no_typeinfo);
     }
 }
-public import gc;
+public import c.gc;
 
 version (Windows)
 {
