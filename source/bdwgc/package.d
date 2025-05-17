@@ -17,7 +17,8 @@ version (D_BetterC)
     }
 }
 
-import c.gc;
+/// BDWGC C bindings
+public import c.gc; // @system
 import std.algorithm.comparison : max;
 
 /++
