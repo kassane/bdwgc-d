@@ -1,7 +1,7 @@
 {
 	"name": "bdwgc-d",
 	"description": "bdwgc - D bindings",
-	"version": "0.2.6",
+	"version": "0.2.7",
 	"license": "Apache-2.0",
 	"authors": [
 		"Matheus Catarino França <matheus-catarino@hotmail.com>"
