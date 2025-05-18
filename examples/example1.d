@@ -6,8 +6,8 @@ import bdwgc;
 
 enum max = 10_000_000;
 
-extern (C) @trusted @nogc nothrow
-void main()
+extern (C)
+void main() @trusted
 {
     foreach (i; 0 .. max)
     {

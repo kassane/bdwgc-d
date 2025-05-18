@@ -17,7 +17,7 @@ extern (C++)
     void createPerson(Person* p, const(char)* name, int age) @nogc nothrow;
 }
 
-extern (C) @trusted @nogc nothrow
+extern (C) @trusted
 void main()
 {
     // Enable interior pointer scanning (if needed)
