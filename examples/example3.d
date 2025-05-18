@@ -39,9 +39,6 @@ void main() @trusted
             GC_printf("%d ", n);
         }
         GC_printf("\n");
-
-        // Deallocate (optional, as BDWGC will collect)
-        GCAllocator.instance.deallocate(numbersBuf);
     }
     else
     {
@@ -71,9 +68,6 @@ void main() @trusted
                 GC_printf("%d ", n);
             }
             GC_printf("\n");
-
-            // Deallocate (optional, as BDWGC will collect)
-            GCAllocator.instance.deallocate(numbersBuf);
         });
         t.start();
         t.join();

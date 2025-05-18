@@ -55,9 +55,5 @@ void main() @trusted
                 GC_printf("heap size: %ld\n", heap);
             }
         }
-
-        // Deallocate buffers (optional, as BDWGC will collect, but explicit for safety)
-        GCAllocator.instance.deallocate(pBuf);
-        GCAllocator.instance.deallocate(qBuf);
     }
 }

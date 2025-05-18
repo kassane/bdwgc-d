@@ -46,8 +46,4 @@ void main()
     // Print details
     GC_printf("%s, have %d years old.\n", p1.name, p1.age);
     GC_printf("%s, have %d years old.\n", p2.name, p2.age);
-
-    // Deallocate (optional, as BDWGC will collect)
-    GCAllocator.instance.deallocate(p1[0 .. Person.sizeof]);
-    GCAllocator.instance.deallocate(p2[0 .. Person.sizeof]);
 }
