@@ -49,6 +49,9 @@
             ],
             "targetPath": "build",
             "targetType": "executable",
+            "buildOptions": [
+                "betterC"
+            ],
             "dependencies": {
                 "bdwgc-d": {
                     "path": "../"

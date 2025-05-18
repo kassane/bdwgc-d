@@ -1,19 +1,37 @@
+/++
+ + Example using the BDWGC allocator to allocate an array of strings,
+ + duplicate strings, and print them.
+ +/
 import bdwgc;
+import core.stdc.string : strlen, strcpy;
 
 extern (C)
 void main() @trusted
 {
-    GC_init();
+    // Allocate array
+    char*[] names = (cast(char**) GCAllocator.instance.allocate((char*).sizeof * 3).ptr)[0 .. 3];
 
-    // Create an array of strings
-    char** names = cast(char**) GC_malloc(char.sizeof * 3);
-    names[0] = GC_strdup("John");
-    names[1] = GC_strdup("Sarah");
-    names[2] = GC_strdup("Bob");
+    // Source strings
+    const(char)*[3] src = ["Alice", "Bob", "Charlie"];
+
+    // Copy strings into GC-managed memory
+    foreach (i; 0 .. src.length)
+    {
+        size_t len = strlen(src[i]) + 1;
+        names[i] = cast(char*) GCAllocator.instance.allocate(len).ptr;
+        if (!names[i])
+        {
+            version (unittest)
+                GC_printf("Failed to allocate string %ld\n", i);
+            foreach (j; 0 .. i)
+                GCAllocator.instance.deallocate(names[j][0 .. strlen(names[j]) + 1]);
+            GCAllocator.instance.deallocate(names[0 .. 3]);
+            return;
+        }
+        strcpy(names[i], src[i]);
+    }
 
     // Print names
-    for (int i = 0; i < 3; i++)
-    {
-        GC_printf("Name: %s\n", names[i]);
-    }
+    foreach (name; names)
+        GC_printf("Name: %s\n", name);
 }
