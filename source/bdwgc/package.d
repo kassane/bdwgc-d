@@ -16,8 +16,10 @@ version (D_BetterC)
     }
 }
 
-public import c.gc;
+/// BDWGC C bindings
+public import c.gc; // @system
 import std.algorithm.comparison : max;
+import std.experimental.allocator : IAllocator;
 
 // Declare missing BDWGC thread functions
 version (GCThreads)
@@ -69,7 +71,7 @@ struct ThreadGuard
         {
             if (!GC_thread_is_registered())
             {
-                version (unittest)
+                debug
                     GC_printf("Registering thread\n");
                 GC_register_my_thread();
                 guard.isRegistered = true;
@@ -85,7 +87,7 @@ struct ThreadGuard
         {
             if (isRegistered && GC_thread_is_registered())
             {
-                version (unittest)
+                debug
                     GC_printf("Unregistering thread\n");
                 GC_unregister_my_thread();
             }
@@ -94,25 +96,25 @@ struct ThreadGuard
 }
 
 /++
- + Allocator for BDWGC-managed memory.
+ + Allocator for BDWGC-managed memory, implementing IAllocator.
  + Thread-safe and compatible with `-betterC`.
  + Requires thread registration for multi-threaded use when GCThreads is enabled.
  +/
-struct GCAllocator
+struct BoehmAllocator
 {
     version (StdUnittest) @system unittest
     {
         extern (C) void testAllocator(alias alloc)(); // Declare testAllocator
-        testAllocator!(() => GCAllocator.instance)();
+        testAllocator!(() => BoehmAllocator.instance)();
     }
 
     /// Alignment ensures proper alignment for D data types
-    enum uint platformAlignment = max(double.alignof, real.alignof);
+    enum uint alignment = max(double.alignof, real.alignof);
 
     /// One-time initialization of BDWGC with thread support
     shared static this() @nogc nothrow
     {
-        version (unittest)
+        debug
             GC_printf("Initializing BDWGC\n");
         GC_init();
         version (GCThreads)
@@ -125,7 +127,7 @@ struct GCAllocator
 
     /// Allocates memory of specified size, returns null if allocation fails
     @trusted @nogc nothrow
-    void[] allocate(size_t bytes) shared const
+    void[] allocate(size_t bytes) shared
     {
         if (!bytes)
             return null;
@@ -135,7 +137,7 @@ struct GCAllocator
 
     /// Allocates aligned memory using GC_memalign, returns null if allocation fails
     @trusted @nogc nothrow
-    void[] alignedAllocate(size_t bytes, uint a) shared const
+    void[] alignedAllocate(size_t bytes, uint a) shared
     {
         if (!bytes || !a.isGoodDynamicAlignment)
             return null;
@@ -145,7 +147,7 @@ struct GCAllocator
 
     /// Deallocates memory, safe for null buffers
     @system @nogc nothrow
-    bool deallocate(void[] b) shared const
+    bool deallocate(void[] b) shared
     {
         if (b.ptr)
             GC_FREE(b.ptr);
@@ -154,7 +156,7 @@ struct GCAllocator
 
     /// Reallocates memory to new size, handles zero-size deallocation
     @system @nogc nothrow
-    bool reallocate(ref void[] b, size_t newSize) shared const
+    bool reallocate(ref void[] b, size_t newSize) shared
     {
         if (!newSize)
         {
@@ -171,7 +173,7 @@ struct GCAllocator
 
     /// Allocates zero-initialized memory
     @trusted @nogc nothrow
-    void[] allocateZeroed(size_t bytes) shared const
+    void[] allocateZeroed(size_t bytes) shared
     {
         if (!bytes)
             return null;
@@ -212,30 +214,56 @@ struct GCAllocator
         return GC_is_heap_ptr(cast(void*) ptr) != 0;
     }
 
+    /// Checks if the allocator owns the memory block
+    @trusted @nogc nothrow
+    bool owns(void[] b) shared const
+    {
+        return b.ptr && isHeapPtr(b.ptr);
+    }
+
+    /// Suggests a good allocation size
+    @trusted @nogc nothrow
+    size_t goodAllocSize(size_t n) shared const
+    {
+        if (n == 0)
+            return 0;
+        // Round up to the next multiple of alignment
+        return ((n + alignment - 1) / alignment) * alignment;
+    }
+
     /// Global thread-safe instance
-    static shared GCAllocator instance;
+    static shared BoehmAllocator instance;
+
+    // IAllocator interface compliance
+    alias allocate this;
 }
 
+/**
+ * Unit tests
+ */
 version (unittest)
 {
+    import std.experimental.allocator : makeArray;
+
     @("Basic allocation and deallocation")
     @nogc @system nothrow unittest
     {
         auto guard = ThreadGuard.create();
-        auto buffer = GCAllocator.instance.allocate(1024 * 1024 * 4);
+        auto buffer = BoehmAllocator.instance.allocate(1024 * 1024 * 4);
         scope (exit)
-            GCAllocator.instance.deallocate(buffer);
+            BoehmAllocator.instance.deallocate(buffer);
         assert(buffer !is null);
-        assert(GCAllocator.instance.isHeapPtr(buffer.ptr));
+        assert(BoehmAllocator.instance.isHeapPtr(buffer.ptr));
+        assert(BoehmAllocator.instance.owns(buffer));
     }
 
     @("Aligned allocation")
     @nogc @system nothrow unittest
     {
         auto guard = ThreadGuard.create();
-        auto buffer = GCAllocator.instance.alignedAllocate(1024, 128);
+        auto buffer = BoehmAllocator.instance.alignedAllocate(1024, 128);
         scope (exit)
-            GCAllocator.instance.deallocate(buffer);
+            BoehmAllocator.instance.deallocate(buffer);
         assert(buffer !is null);
         assert((cast(size_t) buffer.ptr) % 128 == 0);
     }
@@ -244,20 +272,20 @@ version (unittest)
     @nogc @system nothrow unittest
     {
         auto guard = ThreadGuard.create();
-        void[] b = GCAllocator.instance.allocate(16);
+        void[] b = BoehmAllocator.instance.allocate(16);
         assert(b !is null, "Allocation failed");
         (cast(ubyte[]) b)[] = ubyte(1);
         // Debug: Print buffer contents before reallocation
-        version (unittest)
+        debug
         {
             GC_printf("Before realloc: ");
             foreach (i; 0 .. 16)
                 GC_printf("%02x ", (cast(ubyte[]) b)[i]);
             GC_printf("\n");
         }
-        assert(GCAllocator.instance.reallocate(b, 32), "Reallocation failed");
+        assert(BoehmAllocator.instance.reallocate(b, 32), "Reallocation failed");
         // Debug: Print buffer contents after reallocation
-        version (unittest)
+        debug
         {
             GC_printf("After realloc: ");
             foreach (i; 0 .. 16)
@@ -274,25 +302,25 @@ version (unittest)
                 break;
             }
         assert(isEqual, "Reallocated buffer contents incorrect");
-        GCAllocator.instance.deallocate(b);
+        BoehmAllocator.instance.deallocate(b);
 
-        auto zeroed = GCAllocator.instance.allocateZeroed(16);
+        auto zeroed = BoehmAllocator.instance.allocateZeroed(16);
         assert(zeroed !is null, "Zeroed allocation failed");
         ubyte[16] zeroExpected = 0;
         assert((cast(ubyte[]) zeroed)[] == zeroExpected, "Zeroed buffer not zero");
-        GCAllocator.instance.deallocate(zeroed);
+        BoehmAllocator.instance.deallocate(zeroed);
     }
 
     @("Incremental GC and collection")
     @nogc @system nothrow unittest
     {
         auto guard = ThreadGuard.create();
-        GCAllocator.instance.enableIncremental();
-        auto b = GCAllocator.instance.allocate(1024);
+        BoehmAllocator.instance.enableIncremental();
+        auto b = BoehmAllocator.instance.allocate(1024);
         assert(b !is null);
-        GCAllocator.instance.collect();
-        GCAllocator.instance.disable();
-        GCAllocator.instance.deallocate(b);
+        BoehmAllocator.instance.collect();
+        BoehmAllocator.instance.disable();
+        BoehmAllocator.instance.deallocate(b);
     }
 
     @("Allocator interface compliance")
@@ -308,7 +336,7 @@ version (unittest)
             assert(*p == 42);
         }
 
-        test!GCAllocator();
+        test!BoehmAllocator();
     }
 
     @("Thread registration")
@@ -320,18 +348,18 @@ version (unittest)
             {
                 auto guard = ThreadGuard.create();
                 assert(GC_thread_is_registered());
-                auto buffer = GCAllocator.instance.allocate(1024);
+                auto buffer = BoehmAllocator.instance.allocate(1024);
                 assert(buffer !is null);
-                GCAllocator.instance.deallocate(buffer);
+                BoehmAllocator.instance.deallocate(buffer);
             }
             assert(!GC_thread_is_registered());
         }
         else
         {
             auto guard = ThreadGuard.create();
-            auto buffer = GCAllocator.instance.allocate(1024);
+            auto buffer = BoehmAllocator.instance.allocate(1024);
             assert(buffer !is null);
-            GCAllocator.instance.deallocate(buffer);
+            BoehmAllocator.instance.deallocate(buffer);
         }
     }
 
@@ -339,10 +367,20 @@ version (unittest)
     @nogc @system nothrow unittest
     {
         auto guard = ThreadGuard.create();
-        void[] b = GCAllocator.instance.alignedAllocate(16, 32);
+        void[] b = BoehmAllocator.instance.alignedAllocate(16, 32);
         (cast(ubyte[]) b)[] = ubyte(1);
         ubyte[16] expected = 1;
         assert((cast(ubyte[]) b)[] == expected);
-        GCAllocator.instance.deallocate(b);
+        BoehmAllocator.instance.deallocate(b);
+    }
+
+    @("IAllocator compliance")
+    @nogc @system nothrow unittest
+    {
+        auto guard = ThreadGuard.create();
+        char*[] names = makeArray!(char*)(BoehmAllocator.instance, 3);
+        assert(names.length == 3);
+        assert(names.ptr);
+        BoehmAllocator.instance.deallocate(names);
     }
 }

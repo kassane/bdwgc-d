@@ -46,7 +46,7 @@ jobs:
       - name: Build examples
         working-directory: examples
         run: |
-          dub :example1
-          dub :example2
-          dub :example3
-          dub :example4
+          dub :example1 -q
+          dub :example2 -q
+          dub :example3 -q
+          dub :example4 -q
