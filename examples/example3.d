@@ -9,7 +9,7 @@ void main() @trusted
 {
     // Enable leak detection and incremental GC
     GC_set_find_leak(1);
-    GCAllocator.instance.enableIncremental();
+    BoehmAllocator.instance.enableIncremental();
     GC_start_incremental_collection();
 
     // Thread registration for main thread (no-op if GCThreads is disabled)
@@ -18,7 +18,7 @@ void main() @trusted
     version (OSX)
     {
         // OSX: Run in main thread due to threading limitations
-        void[] numbersBuf = GCAllocator.instance.allocate(100 * int.sizeof);
+        void[] numbersBuf = BoehmAllocator.instance.allocate(100 * int.sizeof);
         if (!numbersBuf.ptr)
         {
             version (unittest)
@@ -47,7 +47,7 @@ void main() @trusted
             // Register thread with BDWGC
             auto threadGuard = ThreadGuard.create();
 
-            void[] numbersBuf = GCAllocator.instance.allocate(100 * int.sizeof);
+            void[] numbersBuf = BoehmAllocator.instance.allocate(100 * int.sizeof);
             if (!numbersBuf.ptr)
             {
                 version (unittest)

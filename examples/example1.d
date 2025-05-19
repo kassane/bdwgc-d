@@ -12,7 +12,7 @@ void main() @trusted
     foreach (i; 0 .. max)
     {
         // Allocate pointer-sized memory for p (zero-initialized, like GC_MALLOC_ATOMIC)
-        void[] pBuf = GCAllocator.instance.allocateZeroed(size_t.sizeof);
+        void[] pBuf = BoehmAllocator.instance.allocateZeroed(size_t.sizeof);
         if (!pBuf.ptr)
         {
             version (unittest)
@@ -22,22 +22,22 @@ void main() @trusted
         auto p = cast(int**) pBuf.ptr;
 
         // Allocate pointer-sized memory for q
-        void[] qBuf = GCAllocator.instance.allocate(size_t.sizeof);
+        void[] qBuf = BoehmAllocator.instance.allocate(size_t.sizeof);
         if (!qBuf.ptr)
         {
             version (unittest)
                 GC_printf("Failed to allocate q at iteration %ld\n", i);
-            GCAllocator.instance.deallocate(pBuf);
+            BoehmAllocator.instance.deallocate(pBuf);
             break;
         }
 
         // Reallocate q to twice the size and assign to *p
-        if (!GCAllocator.instance.reallocate(qBuf, size_t.sizeof * 2))
+        if (!BoehmAllocator.instance.reallocate(qBuf, size_t.sizeof * 2))
         {
             version (unittest)
                 GC_printf("Failed to reallocate q at iteration %ld\n", i);
-            GCAllocator.instance.deallocate(pBuf);
-            GCAllocator.instance.deallocate(qBuf);
+            BoehmAllocator.instance.deallocate(pBuf);
+            BoehmAllocator.instance.deallocate(qBuf);
             break;
         }
         *p = cast(int*) qBuf.ptr;

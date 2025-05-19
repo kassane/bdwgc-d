@@ -31,9 +31,9 @@ void main()
         version (unittest)
             GC_printf("Failed to create Person instances\n");
         if (p1)
-            GCAllocator.instance.deallocate(p1[0 .. Person.sizeof]);
+            BoehmAllocator.instance.deallocate(p1[0 .. Person.sizeof]);
         if (p2)
-            GCAllocator.instance.deallocate(p2[0 .. Person.sizeof]);
+            BoehmAllocator.instance.deallocate(p2[0 .. Person.sizeof]);
         return;
     }
 
@@ -41,7 +41,7 @@ void main()
     createPerson(p2, "Sarah", 35);
 
     // Perform GC collection
-    GCAllocator.instance.collect();
+    BoehmAllocator.instance.collect();
 
     // Print details
     GC_printf("%s, have %d years old.\n", p1.name, p1.age);
