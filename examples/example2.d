@@ -1,34 +1,39 @@
 /++
- + Example using the BDWGC allocator to allocate an array of strings,
- + duplicate strings, and print them.
+ + Concise example using the BoehmAllocator with std.experimental.allocator.makeArray
+ + to allocate and print an array of strings.
  +/
 import bdwgc;
 import core.stdc.string : strlen, strcpy;
+import std.experimental.allocator : makeArray;
 
-extern (C)
-void main() @trusted
+extern (C) @trusted
+void main()
 {
-    // Allocate array
-    char*[] names = (cast(char**) GCAllocator.instance.allocate((char*).sizeof * 3).ptr)[0 .. 3];
+    auto guard = ThreadGuard.create();
 
-    // Source strings
-    const(char)*[3] src = ["Alice", "Bob", "Charlie"];
+    // Allocate array of 3 char* pointers using makeArray
+    char*[] names = makeArray!(char*)(BoehmAllocator.instance, 3);
+    if (!names.ptr)
+    {
+        debug
+            GC_printf("Failed to allocate names array\n");
+        return;
+    }
 
     // Copy strings into GC-managed memory
-    foreach (i; 0 .. src.length)
+    immutable src = ["Alice", "Bob", "Charlie"];
+    foreach (i, s; src)
     {
-        size_t len = strlen(src[i]) + 1;
-        names[i] = cast(char*) GCAllocator.instance.allocate(len).ptr;
+        auto len = strlen(s.ptr) + 1;
+        names[i] = cast(char*) BoehmAllocator.instance.allocate(len).ptr;
         if (!names[i])
         {
-            version (unittest)
+            debug
                 GC_printf("Failed to allocate string %ld\n", i);
-            foreach (j; 0 .. i)
-                GCAllocator.instance.deallocate(names[j][0 .. strlen(names[j]) + 1]);
-            GCAllocator.instance.deallocate(names[0 .. 3]);
+            BoehmAllocator.instance.deallocate(names);
             return;
         }
-        strcpy(names[i], src[i]);
+        strcpy(names[i], s.ptr);
     }
 
     // Print names
