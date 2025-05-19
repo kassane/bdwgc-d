@@ -1,49 +1,70 @@
 /++
- + Example using the BDWGC allocator to manage C++ Person structs,
- + populate them, collect garbage, and print details.
+ + -betterC compatible example using the BoehmAllocator to manage C++ Person structs
+ + via C++ FFI, populate them, collect garbage, and print details.
  +/
 import bdwgc;
 
-extern (C++)
-{
-    struct Person
-    {
+extern (C++) {
+    struct Person {
         char* name;
         int age;
-        Person* people;
     }
 
     Person* newPerson() @nogc nothrow;
     void createPerson(Person* p, const(char)* name, int age) @nogc nothrow;
 }
 
-extern (C) @trusted
-void main()
-{
-    // Enable interior pointer scanning (if needed)
-    GC_set_all_interior_pointers(1);
+// Compile-time data for Person instances
+private struct PersonData {
+    const(char)* name;
+    int age;
+}
+
+extern (C) @nogc nothrow:
+
+void main() @trusted {
+    // Register main thread for BDWGC
+    auto guard = ThreadGuard.create();
+    debug
+        GC_printf("Main started\n");
+
+    // Define Person data
+    immutable PersonData[2] peopleData = [
+        PersonData("John".ptr, 42),
+        PersonData("Sarah".ptr, 35)
+    ];
+    Person*[2] people;
 
     // Create and populate Person instances
-    auto p1 = newPerson();
-    auto p2 = newPerson();
-    if (!p1 || !p2)
-    {
-        version (unittest)
-            GC_printf("Failed to create Person instances\n");
-        if (p1)
-            BoehmAllocator.instance.deallocate(p1[0 .. Person.sizeof]);
-        if (p2)
-            BoehmAllocator.instance.deallocate(p2[0 .. Person.sizeof]);
-        return;
+    foreach (i, ref p; people) {
+        p = newPerson();
+        if (!p) {
+            debug
+                GC_printf("Failed to create Person #%zu\n", i);
+            goto cleanup;
+        }
+        createPerson(p, peopleData[i].name, peopleData[i].age);
+        if (!p.name) {
+            debug
+                GC_printf("Failed to initialize Person #%zu name\n", i);
+            goto cleanup;
+        }
     }
 
-    createPerson(p1, "John", 42);
-    createPerson(p2, "Sarah", 35);
+    foreach (i, p; people) {
+        GC_printf("%s, have %d years old.\n", p.name, p.age);
+    }
 
     // Perform GC collection
     BoehmAllocator.instance.collect();
+    debug
+        GC_printf("GC collection triggered\n");
 
-    // Print details
-    GC_printf("%s, have %d years old.\n", p1.name, p1.age);
-    GC_printf("%s, have %d years old.\n", p2.name, p2.age);
+cleanup:
+    // Clear references to aid GC
+    foreach (ref p; people)
+        p = null;
+
+    debug
+        GC_printf("Main finishing\n");
 }
