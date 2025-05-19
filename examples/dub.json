@@ -35,6 +35,9 @@
             "mainSourceFile": "example3.d",
             "targetPath": "build",
             "targetType": "executable",
+            "buildOptions": [
+                "betterC"
+            ],
             "dependencies": {
                 "bdwgc-d": {
                     "path": "../"
