@@ -25,10 +25,10 @@ import std.experimental.allocator : IAllocator;
 version (GCThreads)
 {
 extern (C) @nogc nothrow:
-    int GC_thread_is_registered(); // Returns non-zero if thread is registered
-    void GC_register_my_thread(); // Registers the current thread
-    void GC_unregister_my_thread(); // Unregisters the current thread
-    version (Posix) void GC_allow_register_threads(); // Enables dynamic thread registration
+    int GC_thread_is_registered(); /// Returns non-zero if thread is registered
+    void GC_register_my_thread(); /// Registers the current thread
+    void GC_unregister_my_thread(); /// Unregisters the current thread
+    version (Posix) void GC_allow_register_threads(); /// Enables dynamic thread registration
 }
 
 /++

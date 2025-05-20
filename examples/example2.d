@@ -21,7 +21,7 @@ void main()
     }
 
     // Copy strings into GC-managed memory
-    immutable src = ["Alice", "Bob", "Charlie"];
+    string[3] src = ["Alice", "Bob", "Charlie"];
     foreach (i, s; src)
     {
         auto len = strlen(s.ptr) + 1;
@@ -29,7 +29,7 @@ void main()
         if (!names[i])
         {
             debug
-                GC_printf("Failed to allocate string %ld\n", i);
+                GC_printf("Failed to allocate string %d\n", cast(int)i);
             BoehmAllocator.instance.deallocate(names);
             return;
         }

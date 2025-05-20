@@ -10,6 +10,7 @@
             "buildOptions": [
                 "betterC"
             ],
+	    "lflags-windows":["/NODEFAULTLIB:libcmt"],
             "dependencies": {
                 "bdwgc-d": {
                     "path": "../"
@@ -24,6 +25,7 @@
             "buildOptions": [
                 "betterC"
             ],
+	    "lflags-windows":["/NODEFAULTLIB:libcmt"],
             "dependencies": {
                 "bdwgc-d": {
                     "path": "../"
@@ -38,6 +40,7 @@
             "buildOptions": [
                 "betterC"
             ],
+	    "lflags-windows":["/NODEFAULTLIB:libcmt"],
             "dependencies": {
                 "bdwgc-d": {
                     "path": "../"
@@ -72,7 +75,8 @@
             "libs-osx": [
                 "c++"
             ],
-            "preGenerateCommands-linux": [
+	    "lflags-windows":["/NODEFAULTLIB:libcmt"],
+	    "preGenerateCommands-linux": [
                 "g++ -I${BDWGC_D_PACKAGE_DIR}/bdwgc-master/include -c -o example4.o example4.cc"
             ],
             "preGenerateCommands-osx": [

@@ -15,8 +15,8 @@ void main() @trusted
         void[] pBuf = BoehmAllocator.instance.allocateZeroed(size_t.sizeof);
         if (!pBuf.ptr)
         {
-            version (unittest)
-                GC_printf("Failed to allocate p at iteration %ld\n", i);
+            debug
+                GC_printf("Failed to allocate p at iteration %d\n", cast(int)i);
             break;
         }
         auto p = cast(int**) pBuf.ptr;
@@ -25,8 +25,8 @@ void main() @trusted
         void[] qBuf = BoehmAllocator.instance.allocate(size_t.sizeof);
         if (!qBuf.ptr)
         {
-            version (unittest)
-                GC_printf("Failed to allocate q at iteration %ld\n", i);
+            debug
+                GC_printf("Failed to allocate q at iteration %d\n", cast(int)i);
             BoehmAllocator.instance.deallocate(pBuf);
             break;
         }
@@ -34,8 +34,8 @@ void main() @trusted
         // Reallocate q to twice the size and assign to *p
         if (!BoehmAllocator.instance.reallocate(qBuf, size_t.sizeof * 2))
         {
-            version (unittest)
-                GC_printf("Failed to reallocate q at iteration %ld\n", i);
+            debug
+                GC_printf("Failed to reallocate q at iteration %d\n", cast(int)i);
             BoehmAllocator.instance.deallocate(pBuf);
             BoehmAllocator.instance.deallocate(qBuf);
             break;
