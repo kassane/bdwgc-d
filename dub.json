@@ -1,7 +1,7 @@
 {
 	"name": "bdwgc-d",
-	"description": "bdwgc - D bindings",
-	"version": "0.2.9",
+	"description": "BoehmGC Allocator - D bindings",
+	"version": "0.3.0",
 	"license": "Apache-2.0",
 	"authors": [
 		"Matheus Catarino França <matheus-catarino@hotmail.com>"
@@ -15,19 +15,18 @@
 		"debug": {
 			"buildOptions": [
 				"debugMode",
-				"debugInfo"
+				"debugInfo",
+				"debugInfoC"
 			]
 		},
 		"release": {
 			"buildOptions": [
-				"releaseMode",
 				"inline",
 				"optimize"
 			]
 		},
 		"release-debug": {
 			"buildOptions": [
-				"releaseMode",
 				"debugInfo",
 				"inline",
 				"optimize"
