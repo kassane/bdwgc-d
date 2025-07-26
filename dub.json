@@ -1,7 +1,7 @@
 {
 	"name": "bdwgc-d",
 	"description": "BoehmGC Allocator - D bindings",
-	"version": "0.3.0",
+	"version": "0.3.1",
 	"license": "Apache-2.0",
 	"authors": [
 		"Matheus Catarino França <matheus-catarino@hotmail.com>"
@@ -71,7 +71,7 @@
 	],
 	"preBuildCommands-linux": [
 		"mkdir -p build",
-		"curl -sL https://github.com/ivmai/bdwgc/archive/refs/heads/master.tar.gz -o bdwgc.tar.gz",
+		"curl -sL https://github.com/bdwgc/bdwgc/archive/refs/heads/master.tar.gz -o bdwgc.tar.gz",
 		"tar -xzf bdwgc.tar.gz && rm bdwgc.tar.gz",
 		"gcc -Wall -Wextra -Wpedantic -mtune=native -std=c99 -O3 -fPIE -D_REENTRANT -DNO_EXECUTE_PERMISSION -DGC_BUILTIN_ATOMIC -DGC_PTHREAD_START_STANDALONE -DALL_INTERIOR_POINTERS -c -I$PACKAGE_DIR/bdwgc-master/include -o build/allchblk.o $PACKAGE_DIR/bdwgc-master/allchblk.c",
 		"gcc -Wall -Wextra -Wpedantic -mtune=native -std=c99 -O3 -fPIE -D_REENTRANT -DNO_EXECUTE_PERMISSION -DGC_BUILTIN_ATOMIC -DGC_PTHREAD_START_STANDALONE -DALL_INTERIOR_POINTERS -c -I$PACKAGE_DIR/bdwgc-master/include -o build/alloc.o $PACKAGE_DIR/bdwgc-master/alloc.c",
@@ -105,7 +105,7 @@
 	],
 	"preBuildCommands-osx": [
 		"mkdir -p build",
-		"curl -sL https://github.com/ivmai/bdwgc/archive/refs/heads/master.tar.gz -o bdwgc.tar.gz",
+		"curl -sL https://github.com/bdwgc/bdwgc/archive/refs/heads/master.tar.gz -o bdwgc.tar.gz",
 		"tar -xzf bdwgc.tar.gz && rm bdwgc.tar.gz",
 		"clang -Wall -Wextra -Wpedantic -std=c99 -O3 -fPIE -DHAVE_DL_ITERATE_PHDR -DNO_MPROTECT_VDB -DMISSING_MACH_O_GETSECT_H -D_REENTRANT -DNO_EXECUTE_PERMISSION -DGC_BUILTIN_ATOMIC -DALL_INTERIOR_POINTERS -c -I$PACKAGE_DIR/bdwgc-master/include -o build/allchblk.o $PACKAGE_DIR/bdwgc-master/allchblk.c",
 		"clang -Wall -Wextra -Wpedantic -std=c99 -O3 -fPIE -DHAVE_DL_ITERATE_PHDR -DNO_MPROTECT_VDB -DMISSING_MACH_O_GETSECT_H -D_REENTRANT -DNO_EXECUTE_PERMISSION -DGC_BUILTIN_ATOMIC -DALL_INTERIOR_POINTERS -c -I$PACKAGE_DIR/bdwgc-master/include -o build/alloc.o $PACKAGE_DIR/bdwgc-master/alloc.c",
@@ -139,7 +139,7 @@
 	],
 	"preBuildCommands-windows": [
 		"powershell -Command \"mkdir -Force $PACKAGE_DIR\\build\"",
-		"powershell -Command \"(New-Object Net.WebClient).DownloadFile('https://github.com/ivmai/bdwgc/archive/refs/heads/master.zip', 'bdwgc.zip')\"",
+		"powershell -Command \"(New-Object Net.WebClient).DownloadFile('https://github.com/bdwgc/bdwgc/archive/refs/heads/master.zip', 'bdwgc.zip')\"",
 		"powershell -Command \"Expand-Archive -Path bdwgc.zip -DestinationPath . -Force; Remove-Item bdwgc.zip\"",
 		"powershell -Command \"cl.exe /nologo /W0 /O2 /MD /DDONT_USE_USER32_DLL /D_CRT_SECURE_NO_DEPRECATE /DNO_SEH_AVAILABLE /DNO_EXECUTE_PERMISSION /DALL_INTERIOR_POINTERS /I$PACKAGE_DIR\\bdwgc-master\\include /c $PACKAGE_DIR\\bdwgc-master\\allchblk.c /Fo$PACKAGE_DIR\\build\\allchblk.obj\"",
 		"powershell -Command \"cl.exe /nologo /W0 /O2 /MD /DDONT_USE_USER32_DLL /D_CRT_SECURE_NO_DEPRECATE /DNO_SEH_AVAILABLE /DNO_EXECUTE_PERMISSION /DALL_INTERIOR_POINTERS /I$PACKAGE_DIR\\bdwgc-master\\include /c $PACKAGE_DIR\\bdwgc-master\\alloc.c /Fo$PACKAGE_DIR\\build\\alloc.obj\"",
